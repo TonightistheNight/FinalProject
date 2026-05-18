@@ -1,116 +1,536 @@
-//Parent class
+import javax.swing.*;
+import java.awt.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Scanner;
+
 class Character {
-    public void train(){
-        System.out.println("Character trains!");
+    String name;
+    String gender;
+    String species;
+    String characterClass;
+    int strength;
+    int dexterity;
+    int constitution;
+    int intelligence;
+    int wisdom;
+    int charisma;
+    String skills;
+
+    public Character() {
+    }
+    // getSheet() builds and RETURNS the full character sheet as one String
+    public String getSheet() {
+        return "===== CHARACTER SHEET =====\n" +
+                "Name: " + name + "\n" +
+                "Gender: " + gender + "\n" +
+                "Species: " + species + "\n" +
+                "Class: " + characterClass + "\n\n" +
+                "===== STATS =====\n" +
+                "Strength: " + strength + "\n" +
+                "Dexterity: " + dexterity + "\n" +
+                "Constitution: " + constitution + "\n" +
+                "Intelligence: " + intelligence + "\n" +
+                "Wisdom: " + wisdom + "\n" +
+                "Charisma: " + charisma + "\n\n" +
+                "===== STARTER SKILLS =====\n" +
+                skills + "\n";
     }
 }
 
-//Child 1
-class Warrior extends Character{
-    @Override
-    public void train(){
-        System.out.println("Warrior exercises!");
+class Artificer extends Character {
+    public Artificer() {
+        characterClass = "Artificer";
+        strength = 8; dexterity = 10; constitution = 11; intelligence = 15; wisdom = 11; charisma = 10;
+        skills = "Magical Tinkering, Arcane Repair, Tool Expertise";
     }
 }
 
-//Child 2
-class Archer extends Character {
-    @Override
-    public void train(){
-        System.out.println("Archer perfects aim!");
+class Barbarian extends Character {
+    public Barbarian() {
+        characterClass = "Barbarian";
+        strength = 15; dexterity = 11; constitution = 14; intelligence = 8; wisdom = 10; charisma = 9;
+        skills = "Rage, Intimidation, Survival";
     }
 }
 
-//Child 3
+class Bard extends Character {
+    public Bard() {
+        characterClass = "Bard";
+        strength = 8; dexterity = 12; constitution = 10; intelligence = 11; wisdom = 10; charisma = 15;
+        skills = "Performance, Inspiration, Persuasion";
+    }
+}
+
+class Cleric extends Character {
+    public Cleric() {
+        characterClass = "Cleric";
+        strength = 10; dexterity = 9; constitution = 12; intelligence = 10; wisdom = 15; charisma = 11;
+        skills = "Healing Prayer, Divine Sense, Bless";
+    }
+}
+
+class Druid extends Character {
+    public Druid() {
+        characterClass = "Druid";
+        strength = 9; dexterity = 11; constitution = 10; intelligence = 12; wisdom = 15; charisma = 9;
+        skills = "Nature Bond, Wild Shape, Herbal Lore";
+    }
+}
+
+class Fighter extends Character {
+    public Fighter() {
+        characterClass = "Fighter";
+        strength = 14; dexterity = 12; constitution = 13; intelligence = 9; wisdom = 10; charisma = 9;
+        skills = "Weapon Mastery, Second Wind, Guard Stance";
+    }
+}
+
+class Monk extends Character {
+    public Monk() {
+        characterClass = "Monk";
+        strength = 10; dexterity = 15; constitution = 11; intelligence = 10; wisdom = 14; charisma = 8;
+        skills = "Martial Arts, Focus Strike, Quick Step";
+    }
+}
+
+class Paladin extends Character {
+    public Paladin() {
+        characterClass = "Paladin";
+        strength = 14; dexterity = 9; constitution = 13; intelligence = 9; wisdom = 11; charisma = 14;
+        skills = "Divine Smite, Lay on Hands, Holy Oath";
+    }
+}
+
+class Ranger extends Character {
+    public Ranger() {
+        characterClass = "Ranger";
+        strength = 11; dexterity = 14; constitution = 11; intelligence = 10; wisdom = 13; charisma = 9;
+        skills = "Tracking, Archery, Beast Knowledge";
+    }
+}
+
+class Rogue extends Character {
+    public Rogue() {
+        characterClass = "Rogue";
+        strength = 8; dexterity = 15; constitution = 10; intelligence = 12; wisdom = 10; charisma = 11;
+        skills = "Stealth, Sneak Attack, Lockpicking";
+    }
+}
+
+class Sorcerer extends Character {
+    public Sorcerer() {
+        characterClass = "Sorcerer";
+        strength = 8; dexterity = 11; constitution = 10; intelligence = 10; wisdom = 9; charisma = 15;
+        skills = "Spellcasting, Arcane Burst, Bloodline Power";
+    }
+}
+
+class Warlock extends Character {
+    public Warlock() {
+        characterClass = "Warlock";
+        strength = 8; dexterity = 10; constitution = 11; intelligence = 11; wisdom = 9; charisma = 15;
+        skills = "Eldritch Blast, Pact Magic, Dark Insight";
+    }
+}
+
 class Wizard extends Character {
-    @Override
-    public void train() {
-        System.out.println("Wizard reads spellbook!");
+    public Wizard() {
+        characterClass = "Wizard";
+        strength = 7; dexterity = 10; constitution = 9; intelligence = 16; wisdom = 12; charisma = 9;
+        skills = "Spellbook, Arcane Study, Magic Missile";
     }
 }
+// Here "static" just means this method belongs to the Main class itself
+// so we can call it directly from main without making an object
+public class Main {
+    static String selectedSpecies = "";
+    static String selectedClass = "";
+    static Character currentCharacter = null;
 
-//Child 4
-class Princess extends Character {
-    @Override
-        public void train(){
-            System.out.println("Princess studies 'Strategy of War' book!")
+    static String[] speciesList = {
+            "Aasimar", "Dragonborn", "Dwarf", "Elf", "Gnome",
+            "Goliath", "Halfling", "Human", "Orc", "Tiefling"
+    };
+
+    static String[] classList = {
+            "Artificer", "Barbarian", "Bard", "Cleric", "Druid",
+            "Fighter", "Monk", "Paladin", "Ranger", "Rogue",
+            "Sorcerer", "Warlock", "Wizard"
+    };
+
+    public static void main(String[] args) {
+        showMainMenu();
     }
-}
 
-//Parent class
-class Character {
-    public void rest(){
-        System.out.println("Character rests!");
+    public static void showMainMenu() {
+        JFrame frame = new JFrame("DND Character Creator");
+        frame.setSize(500, 350);
+        // This makes the whole program close when the user clicks the X button
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setLayout(new BorderLayout());
+
+        JLabel title = new JLabel("DND Character Creator Catalogue", SwingConstants.CENTER);
+        title.setFont(new Font("Arial", Font.BOLD, 22));
+
+        JTextArea infoArea = new JTextArea();
+        // false means the user can read this text area, but cannot type into it
+        infoArea.setEditable(false);
+        infoArea.setText("Welcome!\n\nBuild a fantasy character by:\n" +
+                "1. Viewing and selecting a species\n" +
+                "2. Viewing and selecting a class\n" +
+                "3. Entering your character's name and gender\n" +
+                "4. Saving the finished character to a file");
+        infoArea.setFont(new Font("Arial", Font.PLAIN, 16));
+
+        JButton speciesButton = new JButton("Open Species Menu");
+        JButton classButton = new JButton("Open Class Menu");
+        JButton createButton = new JButton("Create Character");
+        JButton loadButton = new JButton("Load Character File");
+
+        JPanel buttonPanel = new JPanel(new GridLayout(4, 1, 10, 10));
+        buttonPanel.add(speciesButton);
+        buttonPanel.add(classButton);
+        buttonPanel.add(createButton);
+        buttonPanel.add(loadButton);
+
+        frame.add(title, BorderLayout.NORTH);
+        frame.add(infoArea, BorderLayout.CENTER);
+        frame.add(buttonPanel, BorderLayout.SOUTH);
+
+        speciesButton.addActionListener(e -> showSpeciesMenu());
+        classButton.addActionListener(e -> showClassMenu());
+        createButton.addActionListener(e -> showCreateCharacterMenu());
+        loadButton.addActionListener(e -> loadCharacterFile());
+
+        frame.setVisible(true);
     }
-}
 
-//Child 1
-class Warrior extends Character{
-    @Override
-    public void rest(){
-        System.out.println("Warrior takes a knee!");
+    public static void showSpeciesMenu() {
+        JFrame frame = new JFrame("Species Menu");
+        frame.setSize(600, 400);
+        frame.setLayout(new BorderLayout());
+
+        JList<String> speciesJList = new JList<>(speciesList);
+        JScrollPane scrollPane = new JScrollPane(speciesJList);
+
+        JTextArea infoArea = new JTextArea();
+        infoArea.setEditable(false);
+        infoArea.setFont(new Font("Arial", Font.PLAIN, 15));
+
+        JButton viewButton = new JButton("View Info");
+        JButton selectButton = new JButton("Select Species");
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(viewButton);
+        buttonPanel.add(selectButton);
+
+        frame.add(scrollPane, BorderLayout.WEST);
+        frame.add(infoArea, BorderLayout.CENTER);
+        frame.add(buttonPanel, BorderLayout.SOUTH);
+
+        viewButton.addActionListener(e -> {
+            String selected = speciesJList.getSelectedValue();
+            if (selected != null) {
+                infoArea.setText(getSpeciesInfo(selected));
+            }
+        });
+
+        selectButton.addActionListener(e -> {
+            String selected = speciesJList.getSelectedValue();
+            if (selected != null) {
+                selectedSpecies = selected;
+                JOptionPane.showMessageDialog(frame, selected + " selected!");
+            }
+        });
+
+        frame.setVisible(true);
     }
-}
 
-//Child 2
-class Archer extends Character {
-    @Override
-    public void rest(){
-        System.out.println("Archer sleeps in the trees!");
+    public static void showClassMenu() {
+        JFrame frame = new JFrame("Class Menu");
+        frame.setSize(650, 450);
+        frame.setLayout(new BorderLayout());
+
+        JList<String> classJList = new JList<>(classList);
+        JScrollPane scrollPane = new JScrollPane(classJList);
+
+        JTextArea infoArea = new JTextArea();
+        infoArea.setEditable(false);
+        infoArea.setFont(new Font("Arial", Font.PLAIN, 15));
+
+        JButton viewButton = new JButton("View Info");
+        JButton selectButton = new JButton("Select Class");
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(viewButton);
+        buttonPanel.add(selectButton);
+
+        frame.add(scrollPane, BorderLayout.WEST);
+        frame.add(infoArea, BorderLayout.CENTER);
+        frame.add(buttonPanel, BorderLayout.SOUTH);
+
+        viewButton.addActionListener(e -> {
+            String selected = classJList.getSelectedValue();
+            if (selected != null) {
+                infoArea.setText(getClassInfo(selected));
+            }
+        });
+
+        selectButton.addActionListener(e -> {
+            String selected = classJList.getSelectedValue();
+            if (selected != null) {
+                selectedClass = selected;
+                JOptionPane.showMessageDialog(frame, selected + " selected!");
+            }
+        });
+
+        frame.setVisible(true);
     }
-}
 
-//Child 3
-class Wizard extends Character {
-    @Override
-    public void rest() {
-        System.out.println("Wizard meditates!");
+    public static void showCreateCharacterMenu() {
+        if (selectedSpecies.equals("") || selectedClass.equals("")) {
+            JOptionPane.showMessageDialog(null, "Please select a species and class first.");
+            return;
+        }
+
+        JFrame frame = new JFrame("Create Character");
+        frame.setSize(450, 300);
+        frame.setLayout(new GridLayout(5, 2, 10, 10));
+// GridLayout(5, 2, 10, 10)
+// 5 rows
+// 2 columns
+// 10 pixels horizontal gap
+// 10 pixels vertical gap
+        JLabel nameLabel = new JLabel("Character Name:");
+        JTextField nameField = new JTextField();
+
+        JLabel genderLabel = new JLabel("Gender:");
+        String[] genders = {"Male", "Female", "Non-Binary", "Other"};
+
+        // JComboBox is command for a dropdown menu
+
+        JComboBox<String> genderBox = new JComboBox<>(genders);
+
+        JLabel speciesLabel = new JLabel("Selected Species:");
+        JLabel speciesValue = new JLabel(selectedSpecies);
+
+        JLabel classLabel = new JLabel("Selected Class:");
+        JLabel classValue = new JLabel(selectedClass);
+
+        JButton finishButton = new JButton("Finish Character");
+
+        frame.add(nameLabel);
+        frame.add(nameField);
+        frame.add(genderLabel);
+        frame.add(genderBox);
+        frame.add(speciesLabel);
+        frame.add(speciesValue);
+        frame.add(classLabel);
+        frame.add(classValue);
+        frame.add(new JLabel());
+        frame.add(finishButton);
+
+        finishButton.addActionListener(e -> {
+            String charName = nameField.getText().trim();
+            String gender = (String) genderBox.getSelectedItem();
+
+            if (charName.equals("")) {
+                JOptionPane.showMessageDialog(frame, "Please enter a character name.");
+                return;
+            }
+
+            currentCharacter = createClassObject(selectedClass);
+            currentCharacter.name = charName;
+            currentCharacter.gender = gender;
+            currentCharacter.species = selectedSpecies;
+
+            applySpeciesBonus(currentCharacter, selectedSpecies);
+
+            showCharacterSheet(currentCharacter);
+            saveCharacterToFile(currentCharacter);
+        });
+
+        frame.setVisible(true);
     }
-}
 
-//Child 4
-class Princess extends Character {
-    @Override
-        public void rest(){
-            System.out.println("Princess sleeps in her castle!")
+    public static Character createClassObject(String className) {
+        switch (className) {
+            case "Artificer": return new Artificer();
+            case "Barbarian": return new Barbarian();
+            case "Bard": return new Bard();
+            case "Cleric": return new Cleric();
+            case "Druid": return new Druid();
+            case "Fighter": return new Fighter();
+            case "Monk": return new Monk();
+            case "Paladin": return new Paladin();
+            case "Ranger": return new Ranger();
+            case "Rogue": return new Rogue();
+            case "Sorcerer": return new Sorcerer();
+            case "Warlock": return new Warlock();
+            default: return new Wizard();
+        }
     }
-}
 
-//Parent class
-class Character {
-    public void skill(){
-        System.out.println("Character performs a skill!");
+    public static void applySpeciesBonus(Character c, String species) {
+        switch (species) {
+            case "Aasimar":
+                c.charisma += 2;
+                c.wisdom += 1;
+                break;
+            case "Dragonborn":
+                c.strength += 2;
+                c.charisma += 1;
+                break;
+            case "Dwarf":
+                c.constitution += 2;
+                break;
+            case "Elf":
+                c.dexterity += 2;
+                break;
+            case "Gnome":
+                c.intelligence += 2;
+                break;
+            case "Goliath":
+                c.strength += 2;
+                c.constitution += 1;
+                break;
+            case "Halfling":
+                c.dexterity += 2;
+                break;
+            case "Human":
+                c.strength += 1;
+                c.dexterity += 1;
+                c.constitution += 1;
+                c.intelligence += 1;
+                c.wisdom += 1;
+                c.charisma += 1;
+                break;
+            case "Orc":
+                c.strength += 2;
+                c.constitution += 1;
+                break;
+            case "Tiefling":
+                c.charisma += 2;
+                c.intelligence += 1;
+                break;
+        }
     }
-}
 
-//Child 1
-class Warrior extends Character{
-    @Override
-    public void skill(){
-        System.out.println("Warrior chops the head off an enemy!");
+    public static void showCharacterSheet(Character c) {
+        JFrame frame = new JFrame("Character Sheet");
+        frame.setSize(500, 500);
+        frame.setLayout(new BorderLayout());
+
+        JTextArea sheetArea = new JTextArea();
+        sheetArea.setEditable(false);
+        sheetArea.setFont(new Font("Monospaced", Font.PLAIN, 15));
+        sheetArea.setText(c.getSheet());
+
+        JScrollPane scrollPane = new JScrollPane(sheetArea);
+
+        frame.add(scrollPane, BorderLayout.CENTER);
+        frame.setVisible(true);
     }
-}
 
-//Child 2
-class Archer extends Character {
-    @Override
-    public void skill(){
-        System.out.println("Archer shoots an arrow");
+    public static void saveCharacterToFile(Character c) {
+        try {
+            String fileName = c.name + ".txt";
+            FileWriter writer = new FileWriter(fileName);
+            writer.write(c.getSheet());
+            writer.close();
+            JOptionPane.showMessageDialog(null, "Character saved to " + fileName);
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, "Error saving character file.");
+        }
     }
-}
 
-//Child 3
-class Wizard extends Character {
-    @Override
-    public void skill() {
-        System.out.println("Wizard casts a curse!");
+    public static void loadCharacterFile() {
+        String fileName = JOptionPane.showInputDialog("Enter the character file name (example: Bob.txt)");
+        if (fileName == null || fileName.trim().equals("")) {
+            return;
+        }
+
+        try {
+            File file = new File(fileName);
+            Scanner input = new Scanner(file);
+            StringBuilder content = new StringBuilder();
+
+            while (input.hasNextLine()) {
+                content.append(input.nextLine()).append("\n");
+            }
+            input.close();
+
+            JFrame frame = new JFrame("Loaded Character");
+            frame.setSize(500, 500);
+
+            JTextArea area = new JTextArea();
+            area.setEditable(false);
+            area.setFont(new Font("Monospaced", Font.PLAIN, 15));
+            area.setText(content.toString());
+
+            frame.add(new JScrollPane(area));
+            frame.setVisible(true);
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "File not found.");
+        }
     }
-}
 
-//Child 4
-class Princess extends Character {
-    @Override
-        public void skill(){
-            System.out.println("Princess smacks her enemy with her golden crown!")
+    public static String getSpeciesInfo(String species) {
+        switch (species) {
+            case "Aasimar":
+                return "Aasimar\n\nCelestial-touched people with radiant ancestry.\nBonus: +2 Charisma, +1 Wisdom";
+            case "Dragonborn":
+                return "Dragonborn\n\nDraconic humanoids known for pride, strength, and presence.\nBonus: +2 Strength, +1 Charisma";
+            case "Dwarf":
+                return "Dwarf\n\nDurable and sturdy people known for resilience.\nBonus: +2 Constitution";
+            case "Elf":
+                return "Elf\n\nGraceful and keen-sensed people with natural agility.\nBonus: +2 Dexterity";
+            case "Gnome":
+                return "Gnome\n\nClever and curious people with sharp minds.\nBonus: +2 Intelligence";
+            case "Goliath":
+                return "Goliath\n\nTowering mountain folk with great power and endurance.\nBonus: +2 Strength, +1 Constitution";
+            case "Halfling":
+                return "Halfling\n\nSmall, quick, and lucky adventurers.\nBonus: +2 Dexterity";
+            case "Human":
+                return "Human\n\nAdaptable and versatile people with balanced growth.\nBonus: +1 to all stats";
+            case "Orc":
+                return "Orc\n\nPowerful and intimidating warriors with physical toughness.\nBonus: +2 Strength, +1 Constitution";
+            default:
+                return "Tiefling\n\nInfernal-blooded people with strong will and magic potential.\nBonus: +2 Charisma, +1 Intelligence";
+        }
+    }
+
+    public static String getClassInfo(String className) {
+        switch (className) {
+            case "Artificer":
+                return "Artificer\n\nA magical inventor who combines tools and arcane power.\nStarter Skills: Magical Tinkering, Arcane Repair, Tool Expertise";
+            case "Barbarian":
+                return "Barbarian\n\nA fierce warrior powered by rage and toughness.\nStarter Skills: Rage, Intimidation, Survival";
+            case "Bard":
+                return "Bard\n\nA performer and support caster who inspires others.\nStarter Skills: Performance, Inspiration, Persuasion";
+            case "Cleric":
+                return "Cleric\n\nA divine caster focused on faith, healing, and blessings.\nStarter Skills: Healing Prayer, Divine Sense, Bless";
+            case "Druid":
+                return "Druid\n\nA nature-focused caster tied to beasts and the wild.\nStarter Skills: Nature Bond, Wild Shape, Herbal Lore";
+            case "Fighter":
+                return "Fighter\n\nA disciplined weapon specialist with strong combat basics.\nStarter Skills: Weapon Mastery, Second Wind, Guard Stance";
+            case "Monk":
+                return "Monk\n\nA martial artist who uses speed, discipline, and focus.\nStarter Skills: Martial Arts, Focus Strike, Quick Step";
+            case "Paladin":
+                return "Paladin\n\nA holy warrior guided by justice and divine power.\nStarter Skills: Divine Smite, Lay on Hands, Holy Oath";
+            case "Ranger":
+                return "Ranger\n\nA wilderness hunter skilled in tracking and ranged combat.\nStarter Skills: Tracking, Archery, Beast Knowledge";
+            case "Rogue":
+                return "Rogue\n\nA stealthy expert in trickery, speed, and precision.\nStarter Skills: Stealth, Sneak Attack, Lockpicking";
+            case "Sorcerer":
+                return "Sorcerer\n\nA natural spellcaster whose power comes from bloodline or talent.\nStarter Skills: Spellcasting, Arcane Burst, Bloodline Power";
+            case "Warlock":
+                return "Warlock\n\nA caster who gains magic through a supernatural pact.\nStarter Skills: Eldritch Blast, Pact Magic, Dark Insight";
+            default:
+                return "Wizard\n\nA scholarly arcane caster who learns magic through study.\nStarter Skills: Spellbook, Arcane Study, Magic Missile";
+        }
     }
 }
