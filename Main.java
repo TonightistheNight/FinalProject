@@ -5,6 +5,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Scanner;
 
+//===========================
+// PARENT CLASS
+//===========================
+//This is the superclass that holds all the shared variables that EVERY character needs
+
 class Character {
     String name;
     String gender;
@@ -17,10 +22,11 @@ class Character {
     int wisdom;
     int charisma;
     String skills;
-
+//empty constructor
     public Character() {
     }
     // getSheet() builds and RETURNS the full character sheet as one String
+    //This is so the user can easily print it to the screen OR save it to a file.
     public String getSheet() {
         return "===== CHARACTER SHEET =====\n" +
                 "Name: " + name + "\n" +
@@ -38,6 +44,9 @@ class Character {
                 skills + "\n";
     }
 }
+
+// ================= CHILD CLASSES (The 13 base D&D Classes)
+//Each subclass extends Character to inherit the stats, but sets its own defaulted values.
 
 class Artificer extends Character {
     public Artificer() {
@@ -142,12 +151,14 @@ class Wizard extends Character {
         skills = "Spellbook, Arcane Study, Magic Missile";
     }
 }
-// Here "static" just means this method belongs to the Main class itself
-// so we can call it directly from main without making an object
 public class Main {
+    // Here static means there is only one copy of it for the entire class,
+    // rather than a separate copy for every object we create
     static String selectedSpecies = "";
     static String selectedClass = "";
     static Character currentCharacter = null;
+
+    // Arrays holding the names of our character species and class options
 
     static String[] speciesList = {
             "Aasimar", "Dragonborn", "Dwarf", "Elf", "Gnome",
@@ -165,59 +176,80 @@ public class Main {
     }
 
     public static void showMainMenu() {
+        // JFrame = actual window the user sees on their screen
         JFrame frame = new JFrame("DND Character Creator");
-        frame.setSize(500, 350);
+        frame.setSize(700, 500);
         // This makes the whole program close when the user clicks the X button
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(new BorderLayout());
-
         JLabel title = new JLabel("DND Character Creator Catalogue", SwingConstants.CENTER);
-        title.setFont(new Font("Arial", Font.BOLD, 22));
+        title.setFont(new Font("Arial", Font.BOLD, 30));
+        //"SwingConstants" is a built in Java tool that holds spacial alignment words
+// such as North, South, East, West, Left Right and Center.
+// Had a bit of a struggle here, didn't know how to bring the Title to the center of the Jlabel.
 
-        JTextArea infoArea = new JTextArea();
-        // false means the user can read this text area, but cannot type into it
-        infoArea.setEditable(false);
-        infoArea.setText("Welcome!\n\nBuild a fantasy character by:\n" +
-                "1. Viewing and selecting a species\n" +
-                "2. Viewing and selecting a class\n" +
-                "3. Entering your character's name and gender\n" +
-                "4. Saving the finished character to a file");
-        infoArea.setFont(new Font("Arial", Font.PLAIN, 16));
+        // NOTE: I changed the JTextArea to a JLabel to make it easier to center align the fixed instructions
 
+        JLabel infoArea = new JLabel("", SwingConstants.CENTER);
+        // By starting with <html>, we can use <br> for new lines and <center> to center the text
+        infoArea.setText("<html><center>Welcome!<br><br>Build your D&D character by:<br>" +
+                "1. Viewing and selecting a species<br>" +
+                "2. Viewing and selecting a class<br>" +
+                "3. Entering your character's name and gender<br>" +
+                "4. Saving the finished character to a file</center></html>");
+
+        infoArea.setFont(new Font("Calibri", Font.PLAIN, 25));
+
+        // Create the users buttons
         JButton speciesButton = new JButton("Open Species Menu");
         JButton classButton = new JButton("Open Class Menu");
         JButton createButton = new JButton("Create Character");
         JButton loadButton = new JButton("Load Character File");
 
+        // GridLayout arranges items in a grid. (Rows, Columns, a horizontal gap, vertical gap.)
         JPanel buttonPanel = new JPanel(new GridLayout(4, 1, 10, 10));
         buttonPanel.add(speciesButton);
         buttonPanel.add(classButton);
         buttonPanel.add(createButton);
         buttonPanel.add(loadButton);
 
+        JPanel centeredButtonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        centeredButtonPanel.add(buttonPanel);
+
+
+        // Add the pieces into the BorderLayout zones
+
         frame.add(title, BorderLayout.NORTH);
         frame.add(infoArea, BorderLayout.CENTER);
-        frame.add(buttonPanel, BorderLayout.SOUTH);
-
+        frame.add(centeredButtonPanel, BorderLayout.SOUTH);
+// Action Listeners wait for the user to click the button, then run the code inside
+        // "e ->" is a "lambda" expression, which is just a shortcut way of writing a listener
         speciesButton.addActionListener(e -> showSpeciesMenu());
         classButton.addActionListener(e -> showClassMenu());
         createButton.addActionListener(e -> showCreateCharacterMenu());
         loadButton.addActionListener(e -> loadCharacterFile());
-
+// Makes the window actually appear on the screen
         frame.setVisible(true);
     }
 
     public static void showSpeciesMenu() {
         JFrame frame = new JFrame("Species Menu");
-        frame.setSize(600, 400);
+        frame.setSize(1000, 400);
         frame.setLayout(new BorderLayout());
 
         JList<String> speciesJList = new JList<>(speciesList);
+        // NOTE: This restricts the list height so it doesn't leave a massive gap
+        speciesJList.setVisibleRowCount(10);
+
         JScrollPane scrollPane = new JScrollPane(speciesJList);
+
+        // NOTE: We wrap the list in a panel pinned to the NORTH so it doesn't stretch to the bottom
+        JPanel listWrapper = new JPanel(new BorderLayout());
+        listWrapper.add(scrollPane, BorderLayout.NORTH);
 
         JTextArea infoArea = new JTextArea();
         infoArea.setEditable(false);
-        infoArea.setFont(new Font("Arial", Font.PLAIN, 15));
+        infoArea.setFont(new Font("Arial", Font.PLAIN, 22));
 
         JButton viewButton = new JButton("View Info");
         JButton selectButton = new JButton("Select Species");
@@ -226,10 +258,12 @@ public class Main {
         buttonPanel.add(viewButton);
         buttonPanel.add(selectButton);
 
-        frame.add(scrollPane, BorderLayout.WEST);
+        // NOTE: We add 'listWrapper' instead of 'scrollPane' to the WEST zone
+        frame.add(listWrapper, BorderLayout.WEST);
         frame.add(infoArea, BorderLayout.CENTER);
         frame.add(buttonPanel, BorderLayout.SOUTH);
 
+        // When "View" Button is clicked, get the highlighted word from the list and find its info
         viewButton.addActionListener(e -> {
             String selected = speciesJList.getSelectedValue();
             if (selected != null) {
@@ -254,11 +288,18 @@ public class Main {
         frame.setLayout(new BorderLayout());
 
         JList<String> classJList = new JList<>(classList);
+        // Note: This restricts the list height so it doesn't leave a massive gap
+        classJList.setVisibleRowCount(13);
+
         JScrollPane scrollPane = new JScrollPane(classJList);
+
+        // Note: This wraps the list in a panel pinned to the NORTH so it doesn't stretch to the bottom
+        JPanel listWrapper = new JPanel(new BorderLayout());
+        listWrapper.add(scrollPane, BorderLayout.NORTH);
 
         JTextArea infoArea = new JTextArea();
         infoArea.setEditable(false);
-        infoArea.setFont(new Font("Arial", Font.PLAIN, 15));
+        infoArea.setFont(new Font("Arial", Font.PLAIN, 22));
 
         JButton viewButton = new JButton("View Info");
         JButton selectButton = new JButton("Select Class");
@@ -267,7 +308,8 @@ public class Main {
         buttonPanel.add(viewButton);
         buttonPanel.add(selectButton);
 
-        frame.add(scrollPane, BorderLayout.WEST);
+        // NOTE: We add 'listWrapper' instead of 'scrollPane' to the WEST zone
+        frame.add(listWrapper, BorderLayout.WEST);
         frame.add(infoArea, BorderLayout.CENTER);
         frame.add(buttonPanel, BorderLayout.SOUTH);
 
@@ -289,7 +331,9 @@ public class Main {
         frame.setVisible(true);
     }
 
+
     public static void showCreateCharacterMenu() {
+        // prevents the user from building a character if they haven't picked the basics yet.
         if (selectedSpecies.equals("") || selectedClass.equals("")) {
             JOptionPane.showMessageDialog(null, "Please select a species and class first.");
             return;
@@ -307,7 +351,7 @@ public class Main {
         JTextField nameField = new JTextField();
 
         JLabel genderLabel = new JLabel("Gender:");
-        String[] genders = {"Male", "Female", "Non-Binary", "Other"};
+        String[] genders = {"Male", "Female", "Other"};
 
         // JComboBox is command for a dropdown menu
 
@@ -329,13 +373,13 @@ public class Main {
         frame.add(speciesValue);
         frame.add(classLabel);
         frame.add(classValue);
-        frame.add(new JLabel());
+        frame.add(new JLabel());  //Empty label to fill a spot in the grid
         frame.add(finishButton);
 
         finishButton.addActionListener(e -> {
             String charName = nameField.getText().trim();
             String gender = (String) genderBox.getSelectedItem();
-
+// Grabs whatever was in the drop-down menu array
             if (charName.equals("")) {
                 JOptionPane.showMessageDialog(frame, "Please enter a character name.");
                 return;
@@ -481,15 +525,15 @@ public class Main {
     public static String getSpeciesInfo(String species) {
         switch (species) {
             case "Aasimar":
-                return "Aasimar\n\nCelestial-touched people with radiant ancestry.\nBonus: +2 Charisma, +1 Wisdom";
+                return "Aasimar\n\nCelestial-touched people with radiant ancestry. \nDescended from humans. Still fundamentally mortal.\nBonus: +2 Charisma, +1 Wisdom";
             case "Dragonborn":
-                return "Dragonborn\n\nDraconic humanoids known for pride, strength, and presence.\nBonus: +2 Strength, +1 Charisma";
+                return "Dragonborn\n\nDraconic (Dragon-like) humanoids with scales, known for pride, strength, and presence.\n(Essentially just lizard people, and can't fly.) \nBonus: +2 Strength, +1 Charisma";
             case "Dwarf":
-                return "Dwarf\n\nDurable and sturdy people known for resilience.\nBonus: +2 Constitution";
+                return "Dwarf\n\nDurable and sturdy people known for resilience. \nRenowned for constructing deep mountainous cities and are some of the best black smiths. \nBonus: +2 Constitution";
             case "Elf":
                 return "Elf\n\nGraceful and keen-sensed people with natural agility.\nBonus: +2 Dexterity";
             case "Gnome":
-                return "Gnome\n\nClever and curious people with sharp minds.\nBonus: +2 Intelligence";
+                return "Gnome\n\nSmall clever and curious people with sharp minds.\nBonus: +2 Intelligence";
             case "Goliath":
                 return "Goliath\n\nTowering mountain folk with great power and endurance.\nBonus: +2 Strength, +1 Constitution";
             case "Halfling":
